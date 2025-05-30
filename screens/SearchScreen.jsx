@@ -15,29 +15,29 @@ const articles = [
     id: "1",
     title: "Top 5 Midfielders for GW12",
     summary: "Best midfielders to pick this week.",
-    image: "https://via.placeholder.com/150",
+    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
   },
   {
     id: "2",
     title: "Captain Picks GW12",
     summary: "Top captains for this gameweek.",
-    image: "https://via.placeholder.com/150",
+    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
   },
   {
     id: "3",
     title: "Injury Updates",
     summary: "Who's out and who's back for GW12.",
-    image: "https://via.placeholder.com/150",
+    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
   },
   {
     id: "4",
     title: "Wildcard Strategy",
     summary: "Best way to use your wildcard chip.",
-    image: "https://via.placeholder.com/150",
+    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
   },
 ];
 
-export default function SearchScreen() {
+export default function SearchScreen({ navigation }) {
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
 
@@ -49,14 +49,22 @@ export default function SearchScreen() {
   );
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.image} />
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate("ArticleDetail", { article: item })}
+    >
+      <Image
+        source={{ uri: item.image }}
+        style={styles.thumbnail}
+        resizeMode="cover"
+      />
       <View style={styles.cardContent}>
-        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.articleTitle}>{item.title}</Text>
         <Text style={styles.summary}>{item.summary}</Text>
       </View>
     </TouchableOpacity>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -166,6 +174,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: "hidden",
     flexDirection: "row",
+    alignItems: "center",
+  },
+  cardContent: {
+    flex: 1,
+    padding: 10,
+  },
+  thumbnail: {
+    width: 100,
+    height: 100,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  articleTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
   },
   image: {
     width: 100,

@@ -12,21 +12,24 @@ import ArticleDetailScreen from "./screens/ArticleDetailScreen";
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
+const SearchStack = createNativeStackNavigator();
 
+// Stack for Home Tab
 function HomeStackScreen() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen
-        name="HomeMain"
-        component={HomeScreen}
-        options={{ title: "FPL Digest" }}
-      />
-      <HomeStack.Screen
-        name="ArticleDetail"
-        component={ArticleDetailScreen}
-        options={{ title: "Article Detail" }}
-      />
+      <HomeStack.Screen name="HomeMain" component={HomeScreen} />
+      <HomeStack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
     </HomeStack.Navigator>
+  );
+}
+
+function SearchStackScreen() {
+  return (
+    <SearchStack.Navigator screenOptions={{ headerShown: false }}>
+      <SearchStack.Screen name="SearchMain" component={SearchScreen} />
+      <SearchStack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+    </SearchStack.Navigator>
   );
 }
 
@@ -43,7 +46,7 @@ export default function App() {
             backgroundColor: "#fff",
             borderTopWidth: 0.5,
             paddingBottom: 6,
-            paddingTop: 6,
+            paddingTop: 0,
             height: 60,
           },
           tabBarIcon: ({ color }) => {
@@ -68,7 +71,7 @@ export default function App() {
         })}
       >
         <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Search" component={SearchStackScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>

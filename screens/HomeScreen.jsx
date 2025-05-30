@@ -44,6 +44,8 @@ const articles = Array.from({ length: 20 }, (_, i) => ({
 export default function HomeScreen() {
   const navigation = useNavigation();
 
+  const featuredArticle = articles[0];
+
   const renderArticle = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
@@ -60,13 +62,29 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-       
         <View style={styles.topBar}>
           <Text style={styles.appTitle}>FPL News</Text>
           <Ionicons name="notifications-outline" size={24} color="#333" />
         </View>
 
-    
+        <TouchableOpacity
+          style={styles.featuredContainer}
+          onPress={() =>
+            navigation.navigate("ArticleDetail", { article: featuredArticle })
+          }
+        >
+          <Image
+            source={{ uri: featuredArticle.image }}
+            style={styles.featuredImage}
+          />
+          <View style={styles.featuredOverlay}>
+            <Text style={styles.featuredTitle}>{featuredArticle.title}</Text>
+            <Text style={styles.featuredSummary}>
+              {featuredArticle.summary}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
         <View style={styles.tipsContainer}>
           <ScrollView
             horizontal
@@ -82,7 +100,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        
         <FlatList
           data={articles}
           renderItem={renderArticle}
@@ -115,6 +132,37 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
+
+  featuredContainer: {
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: "hidden",
+    height: 200,
+    position: "relative",
+  },
+  featuredImage: {
+    width: "100%",
+    height: "100%",
+  },
+  featuredOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  featuredTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  featuredSummary: {
+    fontSize: 14,
+    color: "#ddd",
+    marginTop: 4,
+  },
+
   tipsContainer: {
     height: 120,
     marginBottom: 12,
