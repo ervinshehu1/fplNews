@@ -41,7 +41,7 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
 
-  // For now, filtering just by search query; you can later add filter logic for selectedFilter
+  
   const filteredArticles = articles.filter(
     (article) =>
       article.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -60,13 +60,13 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Top Bar */}
+    
       <View style={styles.topBar}>
         <Text style={styles.titleText}>Search</Text>
         <Ionicons name="filter-outline" size={24} color="#333" />
       </View>
 
-      {/* Search Input */}
+     
       <TextInput
         style={styles.input}
         placeholder="Search articles..."
@@ -74,7 +74,6 @@ export default function SearchScreen() {
         onChangeText={setQuery}
       />
 
-      {/* Filter Buttons */}
       <View style={styles.filterRow}>
         {["All", "Gameweek", "Position", "Team"].map((filter) => (
           <TouchableOpacity
@@ -97,7 +96,6 @@ export default function SearchScreen() {
         ))}
       </View>
 
-      {/* Results */}
       {filteredArticles.length > 0 ? (
         <FlatList
           data={filteredArticles}

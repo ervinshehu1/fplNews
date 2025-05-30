@@ -60,13 +60,13 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Top Bar */}
+       
         <View style={styles.topBar}>
           <Text style={styles.appTitle}>FPL News</Text>
           <Ionicons name="notifications-outline" size={24} color="#333" />
         </View>
 
-        {/* Tip Cards - fixed height */}
+    
         <View style={styles.tipsContainer}>
           <ScrollView
             horizontal
@@ -82,7 +82,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Article List */}
+        
         <FlatList
           data={articles}
           renderItem={renderArticle}
