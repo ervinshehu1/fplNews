@@ -1,25 +1,57 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
+import { useRoute } from "@react-navigation/native";
 
-export default function ArticleDetailScreen({ route }) {
+export default function ArticleDetailScreen() {
+  const route = useRoute();
   const { article } = route.params;
+
+  if (!article) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>No article data available.</Text>
+      </View>
+    );
+  }
+
+  const openInBrowser = () => {
+    if (article.url) {
+      Linking.openURL(article.url);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
-      <Image source={{ uri: article.image }} style={styles.image} />
-      <View style={styles.content}>
-        <Text style={styles.title}>{article.title}</Text>
-        <Text style={styles.summary}>{article.summary}</Text>
-        <Text style={styles.body}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-          ullamcorper, risus at sagittis efficitur, lorem sem viverra ligula,
-          in suscipit purus metus a justo. Duis commodo, lorem id congue
-          vehicula, turpis purus porttitor neque, vel tincidunt mauris eros in
-          erat. Vivamus fermentum est at magna convallis, a tincidunt lorem
-          gravida. Pellentesque habitant morbi tristique senectus et netus et
-          malesuada fames ac turpis egestas.
+      {article.urlToImage && (
+        <Image
+          source={{ uri: article.urlToImage }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
+      <Text style={styles.title}>{article.title}</Text>
+
+      {article.description && (
+        <Text style={styles.content}>{article.description}</Text>
+      )}
+
+      {article.content && (
+        <Text style={styles.content}>
+          {article.content.replace(/\[\+\d+ chars\]/, "")}
         </Text>
-      </View>
+      )}
+
+      <TouchableOpacity onPress={openInBrowser} style={styles.button}>
+        <Text style={styles.buttonText}>Read Full Article</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -28,28 +60,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    padding: 16,
   },
   image: {
     width: "100%",
-    height: 250,
-    resizeMode: "cover",
-  },
-  content: {
-    padding: 16,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 12,
+    marginBottom: 10,
   },
-  summary: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: "#444",
-  },
-  body: {
+  content: {
     fontSize: 16,
     lineHeight: 24,
     color: "#333",
+    marginBottom: 16,
+  },
+  button: {
+    backgroundColor: "#007bff",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
   },
 });
