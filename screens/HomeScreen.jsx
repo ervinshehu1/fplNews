@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -33,38 +33,52 @@ const tips = [
   },
 ];
 
-const articles = Array.from({ length: 20 }, (_, i) => ({
-  id: String(i + 1),
-  title: `Article ${i + 1}`,
-  summary: `This is a summary of article ${i + 1}`,
-  image:
-    "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
-}));
-
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const featuredArticle = articles[0];
+  useEffect(() => {
+    fetch(
+      "https://newsapi.org/v2/everything?q=Fantasy%20Premier%20League&apiKey=c90981cf6a3c41e1be948e74c7e21e20"
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setArticles(data.articles || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching news:", error);
+        setLoading(false);
+      });
+  }, []);
 
-  const renderArticle = ({ item }) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate("ArticleDetail", { article: item })}
-    >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.cardContent}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.summary}>{item.summary}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          Loading news...
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  const featuredArticle = articles[0] || {
+    title: "No articles found",
+    description: "",
+    urlToImage: "https://via.placeholder.com/400x200.png?text=No+Image",
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.topBar}>
           <Text style={styles.appTitle}>FPL News</Text>
-          <Ionicons name="notifications-outline" size={24} color="#333" />
+          <Ionicons name="notifications-outline" size={24} color="#000" />
         </View>
 
         <TouchableOpacity
@@ -74,13 +88,13 @@ export default function HomeScreen() {
           }
         >
           <Image
-            source={{ uri: featuredArticle.image }}
+            source={{ uri: featuredArticle.urlToImage }}
             style={styles.featuredImage}
           />
           <View style={styles.featuredOverlay}>
             <Text style={styles.featuredTitle}>{featuredArticle.title}</Text>
             <Text style={styles.featuredSummary}>
-              {featuredArticle.summary}
+              {featuredArticle.description}
             </Text>
           </View>
         </TouchableOpacity>
@@ -100,14 +114,25 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        <FlatList
-          data={articles}
-          renderItem={renderArticle}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 100 }}
-        />
-      </View>
+        {articles.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.card}
+            onPress={() => navigation.navigate("ArticleDetail", { article: item })}
+          >
+            <Image
+              source={{
+                uri: item.urlToImage || "https://via.placeholder.com/100",
+              }}
+              style={styles.image}
+            />
+            <View style={styles.cardContent}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.summary}>{item.description}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -132,7 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-
   featuredContainer: {
     marginBottom: 16,
     borderRadius: 16,
@@ -162,7 +186,6 @@ const styles = StyleSheet.create({
     color: "#ddd",
     marginTop: 4,
   },
-
   tipsContainer: {
     height: 120,
     marginBottom: 12,

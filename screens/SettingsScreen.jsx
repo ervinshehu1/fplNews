@@ -7,9 +7,6 @@ export default function SettingsScreen() {
       <View style={styles.container}>
         <Text style={styles.title}>Settings</Text>
 
-        <TouchableOpacity style={styles.option}>
-          <Text style={styles.optionText}>Account</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity style={styles.option}>
           <Text style={styles.optionText}>Notifications</Text>
