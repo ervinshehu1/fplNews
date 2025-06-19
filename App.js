@@ -9,11 +9,12 @@ import HomeScreen from "./screens/HomeScreen";
 import SearchScreen from "./screens/SearchScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import ArticleDetailScreen from "./screens/ArticleDetailScreen";
+import FixturesScreen from "./screens/FixturesScreen";
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const SearchStack = createNativeStackNavigator();
-
+const FixturesStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   return (
@@ -28,8 +29,19 @@ function SearchStackScreen() {
   return (
     <SearchStack.Navigator screenOptions={{ headerShown: false }}>
       <SearchStack.Screen name="SearchMain" component={SearchScreen} />
-      <SearchStack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
+      <SearchStack.Screen
+        name="ArticleDetail"
+        component={ArticleDetailScreen}
+      />
     </SearchStack.Navigator>
+  );
+}
+
+function FixturesStackScreen() {
+  return (
+    <FixturesStack.Navigator screenOptions={{ headerShown: false }}>
+      <FixturesStack.Screen name="FixturesMain" component={FixturesScreen} />
+    </FixturesStack.Navigator>
   );
 }
 
@@ -62,6 +74,9 @@ export default function App() {
               case "Settings":
                 iconName = "settings-outline";
                 break;
+              case "Fixtures":
+                iconName = "calendar-outline";
+                break;
               default:
                 iconName = "ellipse-outline";
             }
@@ -72,6 +87,7 @@ export default function App() {
       >
         <Tab.Screen name="Home" component={HomeStackScreen} />
         <Tab.Screen name="Search" component={SearchStackScreen} />
+        <Tab.Screen name="Fixtures" component={FixturesStackScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
