@@ -148,7 +148,7 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tipsScroll}
           >
-            {tips.slice(0, 10).map((tip) => (
+            {tips.slice(0, 38).map((tip) => (
               <TouchableOpacity
                 key={tip.id}
                 style={[
