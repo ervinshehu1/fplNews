@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,71 +10,98 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const articles = [
-  {
-    id: "1",
-    title: "Top 5 Midfielders for GW12",
-    summary: "Best midfielders to pick this week.",
-    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
-  },
-  {
-    id: "2",
-    title: "Captain Picks GW12",
-    summary: "Top captains for this gameweek.",
-    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
-  },
-  {
-    id: "3",
-    title: "Injury Updates",
-    summary: "Who's out and who's back for GW12.",
-    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
-  },
-  {
-    id: "4",
-    title: "Wildcard Strategy",
-    summary: "Best way to use your wildcard chip.",
-    image: "https://www.fantasyfootballfix.com/media/images/FPL_Top_5_Players_MESq5t0.max-80.width-1200.format-webp.webp",
-  },
-];
-
 export default function SearchScreen({ navigation }) {
+  const [articles, setArticles] = useState([]);
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
 
-  
+  const TEAM_KEYWORDS = [
+    "arsenal",
+    "chelsea",
+    "liverpool",
+    "manchester",
+    "tottenham",
+    "villa",
+    "newcastle",
+    "brighton",
+  ];
+  const POSITION_KEYWORDS = [
+    "goalkeeper",
+    "defender",
+    "midfielder",
+    "forward",
+    "striker",
+  ];
+  const GAMEWEEK_KEYWORDS = ["gw", "gameweek"];
+
+  useEffect(() => {
+    fetch(
+      "https://newsapi.org/v2/everything?q=Fantasy%20Premier%20League&apiKey=c90981cf6a3c41e1be948e74c7e21e20"
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        setArticles(data.articles || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching articles:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  const matchesFilter = (article) => {
+    const text =
+      (article.title + " " + article.description).toLowerCase();
+
+    if (selectedFilter === "Gameweek") {
+      return GAMEWEEK_KEYWORDS.some((kw) => text.includes(kw));
+    }
+    if (selectedFilter === "Position") {
+      return POSITION_KEYWORDS.some((kw) => text.includes(kw));
+    }
+    if (selectedFilter === "Team") {
+      return TEAM_KEYWORDS.some((kw) => text.includes(kw));
+    }
+    return true;
+  };
+
   const filteredArticles = articles.filter(
     (article) =>
-      article.title.toLowerCase().includes(query.toLowerCase()) ||
-      article.summary.toLowerCase().includes(query.toLowerCase())
+      matchesFilter(article) &&
+      (article.title?.toLowerCase().includes(query.toLowerCase()) ||
+        article.description?.toLowerCase().includes(query.toLowerCase()))
   );
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item, index }) => (
     <TouchableOpacity
+      key={index}
       style={styles.card}
       onPress={() => navigation.navigate("ArticleDetail", { article: item })}
     >
       <Image
-        source={{ uri: item.image }}
+        source={{ uri: item.urlToImage || "https://via.placeholder.com/100" }}
         style={styles.thumbnail}
         resizeMode="cover"
       />
       <View style={styles.cardContent}>
-        <Text style={styles.articleTitle}>{item.title}</Text>
-        <Text style={styles.summary}>{item.summary}</Text>
+        <Text style={styles.title} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <Text style={styles.summary} numberOfLines={3}>
+          {item.description}
+        </Text>
       </View>
     </TouchableOpacity>
   );
-  
 
   return (
     <View style={styles.container}>
-    
       <View style={styles.topBar}>
         <Text style={styles.titleText}>Search</Text>
         <Ionicons name="filter-outline" size={24} color="#333" />
       </View>
 
-     
       <TextInput
         style={styles.input}
         placeholder="Search articles..."
@@ -104,11 +131,13 @@ export default function SearchScreen({ navigation }) {
         ))}
       </View>
 
-      {filteredArticles.length > 0 ? (
+      {loading ? (
+        <Text style={styles.noResults}>Loading articles...</Text>
+      ) : filteredArticles.length > 0 ? (
         <FlatList
           data={filteredArticles}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(_, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
         />
@@ -175,10 +204,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     flexDirection: "row",
     alignItems: "center",
-  },
-  cardContent: {
-    flex: 1,
-    padding: 10,
+    height: 100,
   },
   thumbnail: {
     width: 100,
@@ -186,22 +212,15 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
-  articleTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  image: {
-    width: 100,
-    height: 100,
-  },
   cardContent: {
     flex: 1,
     padding: 10,
+    justifyContent: "center",
   },
   title: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 4,
   },
   summary: {
     fontSize: 14,

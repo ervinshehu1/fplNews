@@ -92,8 +92,10 @@ export default function HomeScreen() {
             style={styles.featuredImage}
           />
           <View style={styles.featuredOverlay}>
-            <Text style={styles.featuredTitle}>{featuredArticle.title}</Text>
-            <Text style={styles.featuredSummary}>
+            <Text style={styles.featuredTitle} numberOfLines={2}>
+              {featuredArticle.title}
+            </Text>
+            <Text style={styles.featuredSummary} numberOfLines={2}>
               {featuredArticle.description}
             </Text>
           </View>
@@ -127,8 +129,12 @@ export default function HomeScreen() {
               style={styles.image}
             />
             <View style={styles.cardContent}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.summary}>{item.description}</Text>
+              <Text style={styles.title} numberOfLines={2}>
+                {item.title}
+              </Text>
+              <Text style={styles.summary} numberOfLines={3}>
+                {item.description}
+              </Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -214,18 +220,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: "hidden",
     flexDirection: "row",
+    alignItems: "center",
+    height: 100,
   },
   image: {
     width: 100,
     height: 100,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
   },
   cardContent: {
     flex: 1,
     padding: 10,
+    justifyContent: "center",
   },
   title: {
     fontSize: 16,
     fontWeight: "bold",
+    marginBottom: 4,
   },
   summary: {
     fontSize: 14,
