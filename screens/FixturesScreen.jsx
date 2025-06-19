@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    backgroundColor: "#dcdcdc",
+    backgroundColor: "#3e9d68",
     marginHorizontal: 16,
     borderRadius: 12,
     padding: 16,
@@ -678,12 +678,12 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 13,
-    color: "#666",
+    color: "white",
     marginBottom: 4,
   },
   matchText: {
     fontSize: 15,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
   },
 });
