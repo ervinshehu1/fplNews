@@ -10,60 +10,72 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const tips = [
-  {
-    id: "1",
-    title: "Captain Picks GW12",
-    summary: "Best captain options this week.",
-  },
-  {
-    id: "2",
-    title: "Injury News",
-    summary: "Key player injuries ahead of deadline.",
-  },
-  { id: "3", title: "Wildcards", summary: "Strategic tips for wildcard use." },
-  {
-    id: "4",
-    title: "Scout Watch",
-    summary: "Who the scouts are backing this GW.",
-  },
+const tips = Array.from({ length: 38 }, (_, i) => ({
+  id: (i + 1).toString(),
+  title: `GAMEWEEK ${i + 1}`,
+  summary: "All and Best news for this week.",
+}));
+
+const categories = [
+  "All",
+  "Injuries",
+  "Transfers",
+  "Wildcard",
+  "Captain Picks",
+  "Team News",
 ];
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
-  useEffect(() => {
+  const fetchArticles = () => {
     fetch(
       "https://newsapi.org/v2/everything?q=Fantasy%20Premier%20League&apiKey=c90981cf6a3c41e1be948e74c7e21e20"
     )
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((data) => {
         setArticles(data.articles || []);
         setLoading(false);
+        setRefreshing(false);
       })
-      .catch((error) => {
-        console.error("Error fetching news:", error);
+      .catch((err) => {
+        console.error("Error fetching news:", err);
         setLoading(false);
+        setRefreshing(false);
       });
+  };
+
+  useEffect(() => {
+    fetchArticles();
   }, []);
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          Loading news...
-        </Text>
-      </SafeAreaView>
-    );
-  }
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchArticles();
+  };
 
-  const featuredArticle = articles[0] || {
+  const filteredArticles = articles.filter((article) => {
+    const title = article.title?.toLowerCase() || "";
+    const description = article.description?.toLowerCase() || "";
+
+    if (selectedCategory === "All") return true;
+
+    return (
+      title.includes(selectedCategory.toLowerCase()) ||
+      description.includes(selectedCategory.toLowerCase())
+    );
+  });
+
+  const featuredArticle = filteredArticles[0] || {
     title: "No articles found",
     description: "",
     urlToImage: "https://via.placeholder.com/400x200.png?text=No+Image",
@@ -75,11 +87,40 @@ export default function HomeScreen() {
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View style={styles.topBar}>
           <Text style={styles.appTitle}>FPL News</Text>
           <Ionicons name="notifications-outline" size={24} color="#000" />
         </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryScroll}
+        >
+          {categories.map((cat) => (
+            <TouchableOpacity
+              key={cat}
+              onPress={() => setSelectedCategory(cat)}
+              style={[
+                styles.categoryButton,
+                selectedCategory === cat && styles.categoryButtonActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategory === cat && styles.categoryTextActive,
+                ]}
+              >
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         <TouchableOpacity
           style={styles.featuredContainer}
@@ -107,20 +148,47 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tipsScroll}
           >
-            {tips.map((tip) => (
-              <View key={tip.id} style={styles.tipCard}>
-                <Text style={styles.tipTitle}>{tip.title}</Text>
-                <Text style={styles.tipSummary}>{tip.summary}</Text>
-              </View>
+            {tips.slice(0, 10).map((tip) => (
+              <TouchableOpacity
+                key={tip.id}
+                style={[
+                  styles.tipCard,
+                  selectedCategory === tip.title && { backgroundColor: "#333" },
+                ]}
+                onPress={() =>
+                  setSelectedCategory((prev) =>
+                    prev === tip.title ? "All" : tip.title
+                  )
+                }
+              >
+                <Text
+                  style={[
+                    styles.tipTitle,
+                    selectedCategory === tip.title && { color: "#fff" },
+                  ]}
+                >
+                  {tip.title}
+                </Text>
+                <Text
+                  style={[
+                    styles.tipSummary,
+                    selectedCategory === tip.title && { color: "#fff" },
+                  ]}
+                >
+                  {tip.summary}
+                </Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {articles.map((item, index) => (
+        {filteredArticles.map((item, index) => (
           <TouchableOpacity
             key={index}
             style={styles.card}
-            onPress={() => navigation.navigate("ArticleDetail", { article: item })}
+            onPress={() =>
+              navigation.navigate("ArticleDetail", { article: item })
+            }
           >
             <Image
               source={{
@@ -162,6 +230,29 @@ const styles = StyleSheet.create({
   appTitle: {
     fontSize: 24,
     fontWeight: "bold",
+  },
+  categoryScroll: {
+    flexDirection: "row",
+    paddingVertical: 10,
+    marginBottom: 10,
+    paddingLeft: 4,
+  },
+  categoryButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  categoryButtonActive: {
+    backgroundColor: "#333",
+  },
+  categoryText: {
+    color: "#333",
+    fontSize: 14,
+  },
+  categoryTextActive: {
+    color: "#fff",
   },
   featuredContainer: {
     marginBottom: 16,
